@@ -1,0 +1,1 @@
+python train.py /dgx/shared/kashiwada/Data/COCO --gpu-id 3
