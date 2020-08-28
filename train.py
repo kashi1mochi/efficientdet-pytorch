@@ -92,6 +92,8 @@ parser.add_argument('--drop-block', type=float, default=None, metavar='PCT',
                     help='Drop block rate (default: None)')
 parser.add_argument('--clip-grad', type=float, default=10.0, metavar='NORM',
                     help='Clip gradient norm (default: 10.0)')
+parser.add_argument('--gpu-id', type=int, default=0,
+                    help='GPU id')
 
 # Optimizer parameters
 parser.add_argument('--opt', default='momentum', type=str, metavar='OPTIMIZER',
@@ -221,7 +223,7 @@ def main():
     args.distributed = False
     if 'WORLD_SIZE' in os.environ:
         args.distributed = int(os.environ['WORLD_SIZE']) > 1
-    args.device = 'cuda:0'
+    args.device = 'cuda:'+str(args.gpu_id)
     args.world_size = 1
     args.rank = 0  # global rank
     if args.distributed:

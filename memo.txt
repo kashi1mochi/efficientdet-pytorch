@@ -1,1 +1,2 @@
-python train.py /dgx/shared/kashiwada/Data/COCO --gpu-id 3
+python train.py /dgx/shared/kashiwada/Data/COCO --gpu-id 0  --batch-size 16
+python validate.py /dgx/shared/kashiwada/Data/COCO --gpu-id 3

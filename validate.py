@@ -64,6 +64,8 @@ parser.add_argument('--checkpoint', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
+parser.add_argument('--gpu-id', type=int, default=0,
+                    help='GPU id')
 parser.add_argument('--num-gpu', type=int, default=1,
                     help='Number of GPUS to use')
 parser.add_argument('--no-prefetcher', action='store_true', default=False,
@@ -99,7 +101,7 @@ def validate(args):
     param_count = sum([m.numel() for m in bench.parameters()])
     print('Model %s created, param count: %d' % (args.model, param_count))
 
-    bench = bench.cuda()
+    bench = bench.cuda(args.gpu_id)
     if has_amp:
         print('Using AMP mixed precision.')
         bench = amp.initialize(bench, opt_level='O1')
@@ -134,7 +136,10 @@ def validate(args):
     end = time.time()
     with torch.no_grad():
         for i, (input, target) in enumerate(loader):
-            output = bench(input, target['img_scale'], target['img_size'])
+            if args.num_gpu == 1:
+                output = bench(input.cuda(args.gpu_id), target['img_scale'].cuda(args.gpu_id), target['img_size'].cuda(args.gpu_id))
+            else:
+                output = bench(input, target['img_scale'], target['img_size'])
             output = output.cpu()
             sample_ids = target['img_id'].cpu()
             for index, sample in enumerate(output):
